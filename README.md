@@ -27,15 +27,27 @@ later you can use the `j` command to change to those directories quickly.
 
 Matching
 --------
+From all directories in the jump history the one is selected that:
+* matches all given parameters
+* has no parent directory which matches those
+* has the highest priority
 
-Of all directories that contain the parameters in that order, the one with the highest
-    prio - length(path)
-is selected.
+if the History contains for example
+	5  /projects/a/
+    10 /projects/a/src
+    10 /projects/a/src/foo
+	20 /projects/b/src
+The following would match
+* `j a` the first
+* `j b` the last
+* `j src` the last
+* `j a src` the second
+* `j a / /` the third
 
-* To see what matches, add the -r option to see all results.
+Additional Commands:
+* To see what matches instead of jumping, add the -r option
 * The -q option shows the Query string that is used in a SQL-LIKE
 * The Placeholders _ and % can be used
-
 
 Priority
 --------

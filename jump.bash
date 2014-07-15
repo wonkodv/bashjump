@@ -70,7 +70,9 @@ bashjump_jump(){
 			-h)
 				echo "bashJump:
 					j pattern*
-						change to directory which contains all patterns in order.
+						change to directory which contains all patterns in order
+						which does not have a parent directory that matches
+						and which has the highest priority of all matches
 						placeholders:
 							_ for one character
 							% for 0 or more
@@ -80,9 +82,9 @@ bashjump_jump(){
 						print final pattern
 					j -a [dir]
 						add dir or pwd to table
-					j -p [prio] [dir]
+					j -p [dir] [prio]
 						increase priority of dir or pwd by prio or 10
-					j -P [prio] [dir]
+					j -P [dir] [prio]
 						set priority of pwd or dir to prio or 10
 				" | sed 's/^\t\t\t\t//'
 				return
@@ -92,9 +94,32 @@ bashjump_jump(){
 			;;
 		esac
 	done
+
+	sql_from_where_order="
+		FROM
+			jumps j1
+		WHERE
+				j1.dir LIKE '$q'
+			AND
+				NOT EXISTS
+				(
+					SELECT
+						1
+					FROM
+						jumps j2
+					WHERE
+							j1.dir != j2.dir
+						AND
+							j2.dir LIKE '$q'
+						AND
+							1 = INSTR(j1.dir,j2.dir)
+				)
+		ORDER BY prio DESC
+		"
+
 	$opt_query && echo "query: $q" && return
-	$opt_results && sqlite3 -separator "	" "$BASHJUMP_HISTORY" "SELECT prio,dir FROM jumps WHERE dir LIKE '$q' ORDER BY prio-length(dir) DESC" && return
-	d="`bashjump_sql "SELECT dir FROM jumps WHERE dir LIKE '$q' ORDER BY prio-length(dir) DESC LIMIT 1"`"
+	$opt_results && sqlite3 -separator "	" "$BASHJUMP_HISTORY" "SELECT prio,dir $sql_from_where_order" && return
+	d="`bashjump_sql "SELECT dir $sql_from_where_order LIMIT 1"`"
 	if [ -d "$d" ]
 	then
 		cd "$d"
