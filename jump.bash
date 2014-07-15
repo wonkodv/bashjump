@@ -102,8 +102,11 @@ bashjump_jump(){
 	then
 		echo "no dir for query $q"
 	else
-		echo "$d seems deleted"
-		bashjump_sql "DELETE FROM  jumps WHERE dir LIKE '$(bashjump_escape l "$d")%'  ESCAPE '\\';"
+		read -e -p "$d seems deleted, remove from history? [Y/n] " r
+		if [[ "$r" != n && "$r" != "N" ]]
+		then
+			bashjump_sql "DELETE FROM  jumps WHERE dir LIKE '$(bashjump_escape l "$d")%'  ESCAPE '\\';"
+		fi
 	fi
 }
 
