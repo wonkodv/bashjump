@@ -76,6 +76,7 @@ bashjump_jump(){
 						placeholders:
 							_ for one character
 							% for 0 or more
+							. to only search in subdirectories of current
 					j -r pattern*
 						print all matches for pattern
 					j -q
@@ -88,6 +89,9 @@ bashjump_jump(){
 						set priority of pwd or dir to prio or 10
 				" | sed 's/^\t\t\t\t//'
 				return
+			;;
+			.)
+				q="$(bashjump_escape l "$PWD")${q}"
 			;;
 			*)
 				q="${q}$(bashjump_escape l "$x")%"

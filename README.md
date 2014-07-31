@@ -44,7 +44,8 @@ The following would match
 * `j a src` the second
 * `j a / /` the third
 
-Additional Commands:
+Special Parameters:
+* A single dot will prepend the current directory to the query
 * To see what matches instead of jumping, add the -r option
 * The -q option shows the Query string that is used in a SQL-LIKE
 * The Placeholders _ and % can be used
