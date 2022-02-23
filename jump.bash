@@ -6,7 +6,7 @@ bashjump_cd(){
 	builtin cd "${1:-$HOME}"
 	bashjump_sql "INSERT INTO jumps (dir,prio) VALUES ( '$(bashjump_escape s "$PWD")' , 1 ) ;" &>/dev/null  ||
 	bashjump_sql "UPDATE  jumps SET prio = prio + 1 where dir = '$(bashjump_escape s "$PWD")';" &>/dev/null ||
-	echo "bashjump has database problems" > &2
+	echo "bashjump has database problems" >&2
 }
 
 bashjump_jump(){
@@ -126,7 +126,7 @@ bashjump_jump(){
 	d="`bashjump_sql "SELECT dir $sql_from_where_order LIMIT 1"`"
 	if [ -d "$d" ]
 	then
-		cd "$d"
+		builtin cd "$d"
 	elif [ -z "$d" ]
 	then
 		echo "no dir for query $q"
